@@ -64,7 +64,7 @@ function Timer() {
 
   const pauseTimer = async () => {
     try {
-      setTimerStatus('pause');
+      setTimerStatus('paused');
       await axios.post('http://localhost:8000/pause');
     } catch(error) {
       console.error('Error pausing timer:', error);

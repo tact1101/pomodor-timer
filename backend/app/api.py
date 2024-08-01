@@ -45,7 +45,7 @@ async def countdown_timer():
             break
         else: 
             # If nothing from above meets the conditions, we hand over control to the main flow of the program
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(1500)
 
 @app.get("/api/hello")
 async def read_root():
