@@ -6,6 +6,12 @@
   height: 100vh;
   background-color: #282c34;
   color: white;
+  flex-direction: column;
+}
+
+.header {
+  margin-bottom: 30px;
+  font-size: 24px;
 }
 
 .timer {
@@ -28,3 +34,41 @@
   cursor: not-allowed;
   opacity: 0.5;
 }
+
+.progress {
+  margin: 20px;
+}
+
+.timer-info {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.timer-info > div {
+  margin-right: 20px;
+}
+
+.timer-info > div:last-child {
+  margin-right: 0;
+}
+
+.buttons > button {
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  margin-top: 10px;
+  margin-right: 20px;
+  text-decoration: none;
+}
+
+.buttons > button:first-child {
+  padding-left: 43px;
+}
+
+.buttons > button:hover {
+  text-decoration: underline;
+}
+
+

@@ -1,25 +1,44 @@
 import React, { useState, useEffect } from 'react';
+import { ChakraProvider, Box, CircularProgress, CircularProgressLabel } from '@chakra-ui/react'
 import axios from 'axios';
 
+
+function formatTime(seconds) {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+};
+
+function Progress({ timeLeft, totalTime}) {
+  const percentage = ((totalTime - timeLeft) / totalTime) * 100; // gives us a share of passed time
+
+  return (
+    <ChakraProvider>
+      <Box p={4}>
+        <CircularProgress value={percentage} size="240px" thickness="12px" color="cyan.400">
+          <CircularProgressLabel>{formatTime(timeLeft)}</CircularProgressLabel>
+        </CircularProgress>
+      </Box>
+    </ChakraProvider>
+  )
+}
 
 function Timer() {
   const [timerStatus, setTimerStatus] = useState('stopped');
   const [timeLeft, setTimeLeft] = useState(25 * 60);
+  const totalTime = 25 * 60;
 
   useEffect(() => {
     const fetchTimerStatus = async () => {
       try {
         const response = await axios.get('http://localhost:8000/timer_state');
         const {status, timeLeft} = response.data;
-        console.log('Status:', status, 'Time left:', timeLeft);
-
-        if (typeof time_left === 'number' && !isNaN(timeLeft)) {
+        if (typeof timeLeft === 'number' && !isNaN(timeLeft)) {
           setTimerStatus(status);
           setTimeLeft(timeLeft);
         } else {
           console.error('Invalid data format:', response.data);
         }
-        console.log('timeLeft:', timeLeft);
         setTimerStatus(status);
         setTimeLeft(timeLeft);
       } catch(error) {
@@ -28,10 +47,10 @@ function Timer() {
     };
     fetchTimerStatus();
 
-    const interval = setInterval(fetchTimerStatus, 1000); // Fetch every second
+    const interval = setInterval(fetchTimerStatus, 1000); // Fetch every 1 second
 
     return () => clearInterval(interval); // Cleanup on component unmount
-  }, []); /*we pass the empty array to tell react that this component does not depend on any proprs values, so that when they change
+  }, []); /*we pass the empty array to tell react that this component does not depend on any props values, so that when they change
             react won't be doing unnecessary re-fetching and subsequent re-rendering of the component*/
 
   const startTimer = async () => {
@@ -45,8 +64,8 @@ function Timer() {
 
   const pauseTimer = async () => {
     try {
-      await axios.post('http://localhost:8000/pause');
       setTimerStatus('pause');
+      await axios.post('http://localhost:8000/pause');
     } catch(error) {
       console.error('Error pausing timer:', error);
     }
@@ -62,26 +81,26 @@ function Timer() {
     }
   };
 
-  const formatTime = (seconds) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
-  };
-
   return (
     <div className='App'>
-      <h1>Pomodoro Timer</h1>
-      <div>Status: {timerStatus}</div>
-      <div>Time left: {formatTime(timeLeft)}</div>
-      <button onClick={startTimer} disabled={timerStatus === 'running'}>
-        Start
-      </button>
-      <button onClick={pauseTimer} disabled={timerStatus !== 'running'}>
-        Pause
-      </button>
-      <button onClick={resetTimer}>
-        Reset
-      </button>
+      <div className='header'>
+        <h1>Pomodoro Timer</h1>
+      </div>
+      <div className="timer-info">
+        <div>Status: {timerStatus}</div>
+      </div>
+      <Progress timeLeft={timeLeft} totalTime={totalTime}/>
+      <div className="buttons">
+        <button onClick={startTimer} disabled={timerStatus === 'running'}>
+          Start
+        </button>
+        <button onClick={pauseTimer} disabled={timerStatus !== 'running'}>
+          Pause
+        </button>
+        <button onClick={resetTimer}>
+          Reset
+        </button>
+      </div>
     </div>
   );
 }

@@ -37,8 +37,8 @@ async def countdown_timer():
     global timeLeft, timer_status
     while True:
         if timer_status == 'running' and timeLeft > 0:
-            await asyncio.sleep(1) # wait for 1 second before decrementing the timeLeft
             timeLeft -= 1
+            await asyncio.sleep(1) # wait for 1 second before decrementing the timeLeft
             print(f"Time left: {timeLeft}")
         elif timeLeft == 0:
             timer_status = "finished"
@@ -79,5 +79,3 @@ async def reset_timer():
 async def get_timer_state():
     global timer_status, timeLeft
     return TimerState(status=timer_status, timeLeft=timeLeft)
-
-# app.mount("/", StaticFiles(directory="frontend/build", html=True), name="frontend")
