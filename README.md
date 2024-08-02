@@ -5,7 +5,7 @@ for backend
 Python 3.12.4
 Create virtual environment
 python3.12 -m venv env
-Intall required libraries from 
+Install required libraries from 
 pip install -r backend/requirements.txt
 Run the uvicorn server
 python backend/main.py run 
