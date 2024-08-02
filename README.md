@@ -1,7 +1,7 @@
 It's an app for easy use of pomodoro technique built on fastapi and next js framework.
 
-for backend\n
-Python 3.12.4\n
+for backend
+Python 3.12.4
 Create virtual environment
 python3.12 -m venv env
 Intall required libraries from 
