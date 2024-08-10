@@ -1,5 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { ChakraProvider, Box, CircularProgress, CircularProgressLabel } from '@chakra-ui/react'
+import { 
+  Box, 
+  CircularProgress, 
+  CircularProgressLabel, 
+  Button, 
+  Input,
+  FormLabel,
+  FormControl,
+  FormHelperText,
+
+} from '@chakra-ui/react';
 import axios from 'axios';
 
 
@@ -9,29 +19,66 @@ function formatTime(seconds) {
   return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
 };
 
+function CustomTimeForm({ onSubmit }) {
+  const [sessionTime, setSessionTime] = useState('');
+  const [breakTime, setBreakTime] = useState('');
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    onSubmit({ session_time: parseInt(sessionTime) * 60, break_time: parseInt(breakTime) * 60 });
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <FormControl>
+        <FormLabel>Session time (minutes)</FormLabel>
+          <Input
+          className='custom-input'
+          type="number" 
+          value={sessionTime} onChange={(e) => setSessionTime(e.target.value)}
+          />
+          <FormHelperText>Enter session time</FormHelperText>
+        <FormLabel>Break time (minutes)</FormLabel>
+          <Input 
+          type="number" 
+          value={breakTime} 
+          onChange={(e) => setBreakTime(e.target.value)}
+          />
+           <FormHelperText>Enter break time</FormHelperText>
+        </FormControl>
+      <Button
+            mt={4}
+            colorScheme='teal'
+            type='submit'
+            size='sm'
+            variant='solid'
+          >
+            Submit
+          </Button>
+    </form>
+  );
+}
+
 function Progress({ timeLeft, totalTime}) {
   const percentage = ((totalTime - timeLeft) / totalTime) * 100; // gives us a share of passed time
 
   return (
-    <ChakraProvider>
-      <Box p={4}>
-        <CircularProgress value={percentage} size="240px" thickness="12px" color="cyan.400">
-          <CircularProgressLabel>{formatTime(timeLeft)}</CircularProgressLabel>
-        </CircularProgress>
-      </Box>
-    </ChakraProvider>
+    <Box p={4}>
+      <CircularProgress value={percentage} size="240px" thickness="12px" color="cyan.400">
+        <CircularProgressLabel>{formatTime(timeLeft)}</CircularProgressLabel>
+      </CircularProgress>
+    </Box>
   )
 }
 
 function Timer() {
   const [timerStatus, setTimerStatus] = useState('stopped');
-  const [timeLeft, setTimeLeft] = useState(25 * 60);
-  const totalTime = 25 * 60;
+  const [timeLeft, setTimeLeft] = useState('');
+  const [totalTimeCustom, setTotalTimeCustom] = useState('');
 
   useEffect(() => {
     const fetchTimerStatus = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/timer_state');
+        const response = await axios.get('http://localhost:8000/timer/timer_state');
         const {status, timeLeft} = response.data;
         if (typeof timeLeft === 'number' && !isNaN(timeLeft)) {
           setTimerStatus(status);
@@ -55,8 +102,8 @@ function Timer() {
 
   const startTimer = async () => {
     try {
-      await axios.post('http://localhost:8000/start');
-      setTimerStatus('running');
+      await axios.post('http://localhost:8000/timer/start');
+      setTimerStatus('work');
     } catch(error) {
       console.error('Error starting timer:', error);
     }
@@ -65,7 +112,7 @@ function Timer() {
   const pauseTimer = async () => {
     try {
       setTimerStatus('paused');
-      await axios.post('http://localhost:8000/pause');
+      await axios.post('http://localhost:8000/timer/pause');
     } catch(error) {
       console.error('Error pausing timer:', error);
     }
@@ -73,11 +120,25 @@ function Timer() {
 
   const resetTimer = async () => {
     try {
-      await axios.post('http://localhost:8000/reset');
+      await axios.post('http://localhost:8000/timer/reset');
       setTimerStatus('stopped');
-      setTimeLeft(25 * 60);
+      setTimeLeft(totalTimeCustom);
     } catch(error) {
       console.error('Error resetting timer:', error);
+    }
+  };
+
+  const setCustomTimes = async ({ session_time, break_time}) => {
+    try {
+      await axios.post("http://localhost:8000/timer/custom_time_session", {
+        session_time,
+        break_time,
+      });
+      setTotalTimeCustom(session_time);
+      setTimeLeft(session_time);
+      setTimerStatus('stopped');
+    } catch (error) {
+      console.error('Error setting custom time:', error);
     }
   };
 
@@ -89,17 +150,32 @@ function Timer() {
       <div className="timer-info">
         <div>Status: {timerStatus}</div>
       </div>
-      <Progress timeLeft={timeLeft} totalTime={totalTime}/>
-      <div className="buttons">
-        <button onClick={startTimer} disabled={timerStatus === 'running'}>
+      <Progress timeLeft={timeLeft} totalTime={totalTimeCustom}/>
+      <div className="custom-buttons">
+        <Button 
+        colorScheme='teal'
+        size='sx'
+        className='control-button'
+        onClick={startTimer} disabled={timerStatus === 'work'}>
           Start
-        </button>
-        <button onClick={pauseTimer} disabled={timerStatus !== 'running'}>
+        </Button>
+        <Button 
+        colorScheme='teal'
+        size='sx'
+        className='control-button'
+        onClick={pauseTimer} disabled={timerStatus !== 'work'}>
           Pause
-        </button>
-        <button onClick={resetTimer}>
+        </Button>
+        <Button 
+        colorScheme='teal'
+        size='sx'
+        className='control-button'
+        onClick={resetTimer}>
           Reset
-        </button>
+        </Button>
+      </div>
+      <div className="custom-session-time">
+          <CustomTimeForm onSubmit={setCustomTimes} />
       </div>
     </div>
   );

@@ -54,21 +54,17 @@
   margin-right: 0;
 }
 
-.buttons > button {
-  border: none;
-  padding: 10px 20px;
-  cursor: pointer;
-  margin-top: 10px;
-  margin-right: 20px;
-  text-decoration: none;
+.custom-buttons > .control-button {
+  margin: 10px 20px;
+  padding: 0 10px;
 }
 
-.buttons > button:first-child {
-  padding-left: 43px;
+
+.custom-input {
+  color: white;
+  background-color: white;
+  font-size: 16px;
 }
 
-.buttons > button:hover {
-  text-decoration: underline;
-}
 
 
