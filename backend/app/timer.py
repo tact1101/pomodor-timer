@@ -80,12 +80,6 @@ class TimerState:
         self.break_interval = break_time
         self.timer_status = "stopped"
 
-    def set_default(self):
-        self.default_session_time = DEFAULT_WORK_TIME
-        self.default_break_time = DEFAULT_BREAK_TIME
-        self.time_left = DEFAULT_WORK_TIME
-        self.break_interval = DEFAULT_BREAK_TIME
-    
     def start_timer(self):
         if self.timer_status != "work":
             self.timer_status = "work"

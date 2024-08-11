@@ -58,11 +58,6 @@ async def set_custom_time_session(settings: TimerSettings):
     timer_state.set_custom_times(settings.session_time, settings.break_time)
     return {"session_time": settings.session_time, "break_time": settings.break_time}
 
-@app.post("/timer/set_deafult")
-async def set_deafult():
-    timer_state.set_default()
-    print("Timer has been set to default.")
-
 @app.get("/timer/timer_state")
 async def get_timer_state():
-    return {"status": timer_state.timer_status, "timeLeft": timer_state.time_left}
+    return {"status": timer_state.timer_status, "timeLeft": timer_state.time_left, "breakTime": timer_state.break_interval}

@@ -19,12 +19,42 @@ function formatTime(seconds) {
   return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
 };
 
+function GetBreakTime() {
+  const [breakTime, setBreakTime] = useState('');
+  const latestBreakTime = async() => {
+    try {
+      const response = await axios.get('http://localhost:8000/timer/timer_state');
+      const { breakTime } = response.data;
+      if (typeof breakTime === 'number') {
+        setBreakTime(breakTime);
+      } else {
+        console.error('Invalid data format:', breakTime);
+      }
+    } catch(error) {
+      console.error('Error fetching of break time:', error);
+    }
+  };
+
+  useEffect(() => {
+    latestBreakTime();
+  }, []);
+
+  return breakTime;
+}
+
+const defaultSessionTime = 1500;
+
 function CustomTimeForm({ onSubmit }) {
+  const defaultBreakTime = GetBreakTime();
   const [sessionTime, setSessionTime] = useState('');
   const [breakTime, setBreakTime] = useState('');
   const handleSubmit = (event) => {
     event.preventDefault();
-    onSubmit({ session_time: parseInt(sessionTime) * 60, break_time: parseInt(breakTime) * 60 });
+
+    onSubmit({ 
+      session_time: parseInt(sessionTime) * 60 || defaultSessionTime, 
+      break_time: parseInt(breakTime) * 60 || defaultBreakTime 
+    });
   };
 
   return (
@@ -59,7 +89,7 @@ function CustomTimeForm({ onSubmit }) {
 }
 
 function Progress({ timeLeft, totalTime}) {
-  const percentage = ((totalTime - timeLeft) / totalTime) * 100; // gives us a share of passed time
+  const percentage = totalTime > 0 ? ((totalTime - timeLeft) / totalTime) * 100 : 0; // gives us a share of passed time
 
   return (
     <Box p={4}>
