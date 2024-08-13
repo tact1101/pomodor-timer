@@ -1,0 +1,9 @@
+# python
+.pytest_cache
+backend/app/__pycache__
+backend/app/.pytest_cache
+backend/main.py
+backend/env
+
+# js
+frontend/node_modules
